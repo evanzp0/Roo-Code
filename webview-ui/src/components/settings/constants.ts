@@ -42,6 +42,7 @@ export const MODELS_BY_PROVIDER: Partial<Record<ProviderName, Record<string, Mod
 	fireworks: fireworksModels,
 	featherless: featherlessModels,
 	minimax: minimaxModels,
+	// ctyun uses custom model IDs, so no predefined models
 }
 
 export const PROVIDERS = [
@@ -80,4 +81,5 @@ export const PROVIDERS = [
 	{ value: "roo", label: "Roo Code Cloud" },
 	{ value: "vercel-ai-gateway", label: "Vercel AI Gateway" },
 	{ value: "minimax", label: "MiniMax" },
+	{ value: "ctyun", label: "CTyun" },
 ].sort((a, b) => a.label.localeCompare(b.label))

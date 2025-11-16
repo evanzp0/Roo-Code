@@ -42,6 +42,7 @@ import {
 	VercelAiGatewayHandler,
 	DeepInfraHandler,
 	MiniMaxHandler,
+	CTyunHandler,
 } from "./providers"
 import { NativeOllamaHandler } from "./providers/native-ollama"
 
@@ -190,6 +191,8 @@ export function buildApiHandler(configuration: ProviderSettings): ApiHandler {
 			return new VercelAiGatewayHandler(options)
 		case "minimax":
 			return new MiniMaxHandler(options)
+		case "ctyun":
+			return new CTyunHandler(options)
 		default:
 			apiProvider satisfies "gemini-cli" | undefined
 			return new AnthropicHandler(options)

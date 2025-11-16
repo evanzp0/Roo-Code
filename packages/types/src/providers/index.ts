@@ -31,6 +31,7 @@ export * from "./vercel-ai-gateway.js"
 export * from "./zai.js"
 export * from "./deepinfra.js"
 export * from "./minimax.js"
+export * from "./ctyun.js"
 
 import { anthropicDefaultModelId } from "./anthropic.js"
 import { bedrockDefaultModelId } from "./bedrock.js"
@@ -61,6 +62,7 @@ import { vercelAiGatewayDefaultModelId } from "./vercel-ai-gateway.js"
 import { internationalZAiDefaultModelId, mainlandZAiDefaultModelId } from "./zai.js"
 import { deepInfraDefaultModelId } from "./deepinfra.js"
 import { minimaxDefaultModelId } from "./minimax.js"
+import { ctyunDefaultModelId } from "./ctyun.js"
 
 // Import the ProviderName type from provider-settings to avoid duplication
 import type { ProviderName } from "../provider-settings.js"
@@ -107,6 +109,8 @@ export function getProviderDefaultModelId(
 			return moonshotDefaultModelId
 		case "minimax":
 			return minimaxDefaultModelId
+		case "ctyun":
+			return ctyunDefaultModelId
 		case "zai":
 			return options?.isChina ? mainlandZAiDefaultModelId : internationalZAiDefaultModelId
 		case "openai-native":

@@ -38,6 +38,7 @@ import {
 	vercelAiGatewayDefaultModelId,
 	deepInfraDefaultModelId,
 	minimaxDefaultModelId,
+	ctyunDefaultModelId,
 } from "@roo-code/types"
 
 import { vscode } from "@src/utils/vscode"
@@ -98,6 +99,7 @@ import {
 	VercelAiGateway,
 	DeepInfra,
 	MiniMax,
+	CTyun,
 } from "./providers"
 
 import { MODELS_BY_PROVIDER, PROVIDERS } from "./constants"
@@ -602,6 +604,10 @@ const ApiOptions = ({
 
 			{selectedProvider === "minimax" && (
 				<MiniMax apiConfiguration={apiConfiguration} setApiConfigurationField={setApiConfigurationField} />
+			)}
+
+			{selectedProvider === "ctyun" && (
+				<CTyun apiConfiguration={apiConfiguration} setApiConfigurationField={setApiConfigurationField} />
 			)}
 
 			{selectedProvider === "vscode-lm" && (
