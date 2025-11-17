@@ -38,7 +38,7 @@ import {
 	vercelAiGatewayDefaultModelId,
 	deepInfraDefaultModelId,
 	minimaxDefaultModelId,
-	ctyunDefaultModelId,
+	// ctyunDefaultModelId,
 } from "@roo-code/types"
 
 import { vscode } from "@src/utils/vscode"

@@ -17,10 +17,16 @@ export class CTyunHandler extends BaseProvider {
 	protected readonly options: ApiHandlerOptions
 	protected client: OpenAI
 	private readonly providerName = "CTyun"
+	private readonly log: (...args: unknown[]) => void
 
 	constructor(options: ApiHandlerOptions) {
 		super()
 		this.options = options
+
+		// Create a simple logger that outputs to console
+		this.log = (...args: unknown[]) => {
+			console.log(`[${this.providerName}]`, ...args)
+		}
 
 		if (!this.options.ctyunApiKey) {
 			throw new Error("CTyun API key is required")
@@ -67,6 +73,16 @@ export class CTyunHandler extends BaseProvider {
 			stream_options: { include_usage: true },
 		}
 
+		// Log the request details
+		this.log(`=== CTyun API Request ===`)
+		this.log(`Model: ${model}`)
+		this.log(`Max Tokens: ${max_tokens}`)
+		this.log(`Temperature: ${temperature}`)
+		this.log(`System Prompt: ${systemPrompt}`)
+		this.log(`Messages:`, JSON.stringify(messages, null, 2))
+		this.log(`Full Request:`, JSON.stringify(params, null, 2))
+		this.log(`=======================`)
+
 		try {
 			// Use custom request options to ensure proper headers
 			const stream = await this.client.chat.completions.create(params, {
@@ -85,10 +101,15 @@ export class CTyunHandler extends BaseProvider {
 					}) as const,
 			)
 
+			let responseContent = ""
+			let reasoningContent = ""
+			let usageData: any = null
+
 			for await (const chunk of stream) {
 				const delta = chunk.choices?.[0]?.delta
 
 				if (delta?.content) {
+					responseContent += delta.content
 					for (const processedChunk of matcher.update(delta.content)) {
 						yield processedChunk
 					}
@@ -97,11 +118,13 @@ export class CTyunHandler extends BaseProvider {
 				if (delta && "reasoning_content" in delta) {
 					const reasoning_content = (delta.reasoning_content as string | undefined) || ""
 					if (reasoning_content?.trim()) {
+						reasoningContent += reasoning_content
 						yield { type: "reasoning", text: reasoning_content }
 					}
 				}
 
 				if (chunk.usage) {
+					usageData = chunk.usage
 					yield {
 						type: "usage",
 						inputTokens: chunk.usage.prompt_tokens || 0,
@@ -114,7 +137,21 @@ export class CTyunHandler extends BaseProvider {
 			for (const processedChunk of matcher.final()) {
 				yield processedChunk
 			}
+
+			// Log the response details
+			this.log(`=== CTyun API Response ===`)
+			this.log(`Response Content: ${responseContent}`)
+			if (reasoningContent) {
+				this.log(`Reasoning Content: ${reasoningContent}`)
+			}
+			if (usageData) {
+				this.log(`Usage:`, JSON.stringify(usageData, null, 2))
+			}
+			this.log(`=======================`)
 		} catch (error) {
+			this.log(`=== CTyun API Error ===`)
+			this.log(`Error:`, error)
+			this.log(`=======================`)
 			throw handleOpenAIError(error, this.providerName)
 		}
 	}
@@ -130,6 +167,12 @@ export class CTyunHandler extends BaseProvider {
 	async completePrompt(prompt: string): Promise<string> {
 		const { id: modelId } = this.getModel()
 
+		// Log the completePrompt request
+		this.log(`=== CTyun CompletePrompt Request ===`)
+		this.log(`Model: ${modelId}`)
+		this.log(`Prompt: ${prompt}`)
+		this.log(`===============================`)
+
 		try {
 			const response = await this.client.chat.completions.create(
 				{
@@ -144,8 +187,21 @@ export class CTyunHandler extends BaseProvider {
 				},
 			)
 
-			return response.choices?.[0]?.message.content || ""
+			const responseContent = response.choices?.[0]?.message.content || ""
+
+			// Log the completePrompt response
+			this.log(`=== CTyun CompletePrompt Response ===`)
+			this.log(`Response: ${responseContent}`)
+			if (response.usage) {
+				this.log(`Usage:`, JSON.stringify(response.usage, null, 2))
+			}
+			this.log(`================================`)
+
+			return responseContent
 		} catch (error) {
+			this.log(`=== CTyun CompletePrompt Error ===`)
+			this.log(`Error:`, error)
+			this.log(`===============================`)
 			throw handleOpenAIError(error, this.providerName)
 		}
 	}
